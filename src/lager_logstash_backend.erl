@@ -47,7 +47,8 @@
           level :: lager:log_level_number(),
           output :: output(),
           format :: format(),
-          json_encoder :: json_encoder()
+          json_encoder :: json_encoder(),
+          custom_metadata :: list()
          }).
 
 init(Args) ->
@@ -56,6 +57,8 @@ init(Args) ->
     Output = arg(output, Args, ?DEFAULT_OUTPUT),
     Format = arg(format, Args, ?DEFAULT_FORMAT),
     Encoder = arg(json_encoder, Args, ?DEFAULT_ENCODER),
+    CustomMetadata = arg(custom_metadata, Args, []),
+
 
     Handle = connect(Output),
 
@@ -63,6 +66,7 @@ init(Args) ->
                 output = Output,
                 format = Format,
                 json_encoder = Encoder,
+                custom_metadata = CustomMetadata,
                 level = LevelNumber}}.
 
 arg(Name, Args, Default) ->
@@ -108,11 +112,12 @@ handle_event(_Event, State) ->
 
 handle_log(LagerMsg, #state{level = Level,
                             format = Format,
-                            json_encoder = Encoder} = State) ->
+                            json_encoder = Encoder,
+                            custom_metadata = CustomMetadata} = State) ->
     Severity = lager_msg:severity(LagerMsg),
     case lager_util:level_to_num(Severity) =< Level of
         true ->
-            Config = [{json_encoder, Encoder}],
+            Config = [{json_encoder, Encoder}, {custom_metadata, CustomMetadata}],
             Payload = format(Format, LagerMsg, Config),
             send_log(Payload, State);
         false -> skip

@@ -28,6 +28,7 @@
 
 format(LagerMsg, Config) ->
     Encoder = value(json_encoder, Config, ?DEFAULT_JSON_FORMATTER),
+    CustomMetadata = value(custom_metadata, Config, []),
     Level = lager_msg:severity(LagerMsg),
     Timestamp = timestamp(lager_msg:datetime(LagerMsg)),
     Message = lager_msg:message(LagerMsg),
@@ -35,7 +36,7 @@ format(LagerMsg, Config) ->
     Data = [{type, lager_logstash},
             {level, Level},
             {'@timestamp', Timestamp},
-            {message, Message} | Metadata],
+            {message, Message} | Metadata] ++ CustomMetadata,
     [encode(Encoder, convert(Data)), $\n].
 
 format(Message, Config, _) ->
