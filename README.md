@@ -35,7 +35,8 @@ And finally, configure `lager` app with something like this:
        %% {output, {udp, "localhost", 5000}},
        %% {output, {file, "/var/log/lager_logstash.log"}},
        {format, json},
-       {json_encoder, jsx}
+       {json_encoder, jsx},
+       {extra_json_fields, [{env, staging}]}
       ]}
     ]}
   ]}

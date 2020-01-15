@@ -28,6 +28,7 @@
 
 format(LagerMsg, Config) ->
     Encoder = value(json_encoder, Config, ?DEFAULT_JSON_FORMATTER),
+    ExtraJsonFields = value(extra_json_fields, Config, []),
     Level = lager_msg:severity(LagerMsg),
     Timestamp = timestamp(lager_msg:datetime(LagerMsg)),
     Message = lager_msg:message(LagerMsg),
@@ -36,7 +37,7 @@ format(LagerMsg, Config) ->
             {level, Level},
             {'@timestamp', Timestamp},
             {message, Message} | Metadata],
-    [encode(Encoder, convert(Data)), $\n].
+    [encode(Encoder, convert(ExtraJsonFields ++ Data)), $\n].
 
 format(Message, Config, _) ->
     format(Message, Config).
