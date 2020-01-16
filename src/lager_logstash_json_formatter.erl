@@ -59,7 +59,11 @@ convert({K, List}, Acc) when is_list(List) ->
     [{K, iolist_to_binary(List)} | Acc];
 convert({K, Atom}, Acc) when is_atom(Atom) ->
     [{K, atom_to_binary(Atom, latin1)} | Acc];
-convert(Else, Acc) -> [Else | Acc].
+convert({K, V}, Acc) ->
+    %% Unknown format
+    [{K, iolist_to_binary(io_lib:format("~0p", [V]))} | Acc];
+convert(_, Acc) ->
+    Acc.
 
 encode(jsx, Data)   -> jsx:encode(Data);
 encode(jiffy, Data) -> jiffy:encode({Data}).
